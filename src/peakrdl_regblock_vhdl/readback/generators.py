@@ -151,8 +151,8 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
                 # the value is a hwif input, which may not be a std_logic_vector, convert it
                 if get_vhdl_type(field) != "std_logic_vector":
                     value = f"to_std_logic_vector({value})"
-            elif field.implements_storage:
-                # the value is in field storage, which may be a std_logic
+            elif field.implements_storage or not self.exp.hwif.has_value_input(field):
+                # the value is in field storage or constant, which may be a std_logic
                 if field.width == 1:
                     value = f"to_std_logic_vector({value})"
 
