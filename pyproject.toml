@@ -6,23 +6,25 @@ build-backend = "setuptools.build_meta"
 name = "peakrdl-regblock-vhdl"
 dynamic = ["version"]
 requires-python = ">=3.7"
-dependencies = [
-    "systemrdl-compiler >= 1.29.0, < 2",
-    "Jinja2>=2.11",
-]
+dependencies = ["systemrdl-compiler >= 1.29.0, < 2", "Jinja2>=2.11"]
 
-authors = [
-    {name="Alex Mykyta"},
-]
-maintainers = [
-    {name="Dana Sorensen"},
-]
+authors = [{ name = "Alex Mykyta" }]
+maintainers = [{ name = "Dana Sorensen" }]
 description = "Compile SystemRDL into a VHDL control/status register (CSR) block"
 readme = "README.md"
-license = {text = "LGPLv3"}
+license = { text = "LGPLv3" }
 keywords = [
-    "SystemRDL", "PeakRDL", "CSR", "compiler", "tool", "registers", "generator",
-    "VHDL", "register abstraction layer", "FPGA", "ASIC",
+    "SystemRDL",
+    "PeakRDL",
+    "CSR",
+    "compiler",
+    "tool",
+    "registers",
+    "generator",
+    "VHDL",
+    "register abstraction layer",
+    "FPGA",
+    "ASIC",
 ]
 classifiers = [
     #"Development Status :: 5 - Production/Stable",
@@ -37,9 +39,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-cli = [
-    "peakrdl-cli >= 1.2.3",
-]
+cli = ["peakrdl-cli >= 1.2.3"]
 
 [project.urls]
 Source = "https://github.com/SystemRDL/PeakRDL-regblock-vhdl"
@@ -48,21 +48,7 @@ Changelog = "https://github.com/SystemRDL/PeakRDL-regblock-vhdl/releases"
 Documentation = "https://peakrdl-regblock-vhdl.readthedocs.io/"
 
 [tool.setuptools.dynamic]
-version = {attr = "peakrdl_regblock_vhdl.__about__.__version__"}
-
-[tool.uv]
-dev-dependencies = [
-    "jinja2-simple-tags>=0.6.1",
-    "mypy>=0.971",
-    "parameterized>=0.8.1",
-    "peakrdl-regblock>=1.1.0",
-    "peakrdl>=1.1.0",
-    "pylint>=2.6.2",
-    "pytest-cov>=4.0.0",
-    "pytest-parallel>=0.1.1",
-    "pytest>=7.0.1",
-    "wrapt>=1.14.0",
-]
+version = { attr = "peakrdl_regblock_vhdl.__about__.__version__" }
 
 [project.entry-points."peakrdl.exporters"]
 regblock-vhdl = "peakrdl_regblock_vhdl.__peakrdl__:Exporter"
