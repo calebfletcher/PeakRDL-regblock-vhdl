@@ -156,11 +156,11 @@ class DecodeLogicGenerator(RDLForLoopGenerator):
             if readable and writable:
                 rhs_invalid_rw = "'0'"
             elif readable and not writable:
-                rhs = f"{addr_decoding_str} and not cpuif_req_is_wr"
-                rhs_invalid_rw = f"{addr_decoding_str} and cpuif_req_is_wr"
+                rhs = f"{addr_decoding_str} and cpuif_req_op = OP_READ"
+                rhs_invalid_rw = f"{addr_decoding_str} and cpuif_req_op /= OP_READ"
             elif not readable and writable:
-                rhs = f"{addr_decoding_str} and cpuif_req_is_wr"
-                rhs_invalid_rw = f"{addr_decoding_str} and not cpuif_req_is_wr"
+                rhs = f"{addr_decoding_str} and cpuif_req_op = OP_WRITE"
+                rhs_invalid_rw = f"{addr_decoding_str} and cpuif_req_op /= OP_WRITE"
             else:
                 raise RuntimeError
         # Add decoding flags
@@ -219,11 +219,11 @@ class DecodeLogicGenerator(RDLForLoopGenerator):
             rhs = addr_decoding_str
             rhs_invalid_rw = "'0'"
         elif readable and not writable:
-            rhs = f"{addr_decoding_str} and not cpuif_req_is_wr"
-            rhs_invalid_rw = f"{addr_decoding_str} and cpuif_req_is_wr"
+            rhs = f"{addr_decoding_str} and cpuif_req_op = OP_READ"
+            rhs_invalid_rw = f"{addr_decoding_str} and cpuif_req_op /= OP_READ"
         elif not readable and writable:
-            rhs = f"{addr_decoding_str} and cpuif_req_is_wr"
-            rhs_invalid_rw = f"{addr_decoding_str} and not cpuif_req_is_wr"
+            rhs = f"{addr_decoding_str} and cpuif_req_op = OP_WRITE"
+            rhs_invalid_rw = f"{addr_decoding_str} and cpuif_req_op /= OP_WRITE"
         else:
             raise RuntimeError
         # Add decoding flags

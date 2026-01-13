@@ -11,13 +11,13 @@ class PassthroughCpuif(CpuifBase):
 
     @property
     def package_name(self) -> Union[str, None]:
-        return None
+        return "csrif_pkg"
 
     @property
     def port_declaration(self) -> str:
         lines = [
             "s_cpuif_req : in std_logic;",
-            "s_cpuif_req_is_wr : in std_logic;",
+            "s_cpuif_req_op : in csr_access_op;",
            f"s_cpuif_addr : in std_logic_vector({self.addr_width-1} downto 0);",
            f"s_cpuif_wr_data : in std_logic_vector({self.data_width-1} downto 0);",
            f"s_cpuif_wr_biten : in std_logic_vector({self.data_width-1} downto 0);",

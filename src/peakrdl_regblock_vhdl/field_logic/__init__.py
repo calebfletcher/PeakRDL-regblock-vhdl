@@ -190,11 +190,11 @@ class FieldLogic:
         elif buffer_reads and not buffer_writes:
             strb = self.exp.dereferencer.get_access_strobe(field)
             rstrb = self.exp.read_buffering.get_trigger(field.parent)
-            return f"({rstrb}) or ({strb} and decoded_req_is_wr)"
+            return f"({rstrb}) or ({strb} and decoded_req_op /= OP_READ)"
         elif not buffer_reads and buffer_writes:
             strb = self.exp.dereferencer.get_access_strobe(field)
             wstrb = self.exp.write_buffering.get_write_strobe(field)
-            return f"({wstrb}) or ({strb} and not decoded_req_is_wr)"
+            return f"({wstrb}) or ({strb} and decoded_req_op /= OP_WRITE)"
         else:
             strb = self.exp.dereferencer.get_access_strobe(field)
             return strb
@@ -209,7 +209,7 @@ class FieldLogic:
             return rstrb
         else:
             strb = self.exp.dereferencer.get_access_strobe(field)
-            return f"{strb} and not decoded_req_is_wr"
+            return f"{strb} and decoded_req_op /= OP_WRITE"
 
     def get_wr_swacc_identifier(self, field: 'FieldNode') -> str:
         """
@@ -221,7 +221,7 @@ class FieldLogic:
             return wstrb
         else:
             strb = self.exp.dereferencer.get_access_strobe(field)
-            return f"{strb} and decoded_req_is_wr"
+            return f"{strb} and decoded_req_op /= OP_READ"
 
     def get_swmod_identifier(self, field: 'FieldNode') -> str:
         """
@@ -242,14 +242,14 @@ class FieldLogic:
             if buffer_reads:
                 rstrb = self.exp.read_buffering.get_trigger(field.parent)
             else:
-                rstrb = f"{astrb} and not decoded_req_is_wr"
+                rstrb = f"{astrb} and decoded_req_op /= OP_WRITE"
             conditions.append(rstrb)
 
         if w_modifiable:
             if buffer_writes:
                 wstrb = self.exp.write_buffering.get_write_strobe(field)
             else:
-                wstrb = f"{astrb} and decoded_req_is_wr"
+                wstrb = f"{astrb} and decoded_req_op /= OP_READ"
 
             # Due to 10.6.1-f, it is impossible for a field that is sw-writable to
             # be split across subwords.
@@ -440,6 +440,9 @@ class FieldLogic:
 
         self.add_sw_conditional(sw_onread.ClearOnRead(self.exp), AssignmentPrecedence.SW_ONREAD)
         self.add_sw_conditional(sw_onread.SetOnRead(self.exp), AssignmentPrecedence.SW_ONREAD)
+        
+        self.add_sw_conditional(sw_onwrite.WriteCustomSet(self.exp), AssignmentPrecedence.SW_ONWRITE + 2)
+        self.add_sw_conditional(sw_onwrite.WriteCustomClear(self.exp), AssignmentPrecedence.SW_ONWRITE + 1)
 
         self.add_sw_conditional(sw_onwrite.Write(self.exp), AssignmentPrecedence.SW_ONWRITE)
         self.add_sw_conditional(sw_onwrite.WriteSet(self.exp), AssignmentPrecedence.SW_ONWRITE)

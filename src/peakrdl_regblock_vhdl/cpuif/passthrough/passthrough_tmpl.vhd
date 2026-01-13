@@ -1,5 +1,5 @@
 cpuif_req <= s_cpuif_req;
-cpuif_req_is_wr <= s_cpuif_req_is_wr;
+cpuif_req_op <= s_cpuif_req_op;
 cpuif_addr <= s_cpuif_addr;
 cpuif_wr_data <= s_cpuif_wr_data;
 cpuif_wr_biten <= s_cpuif_wr_biten;

@@ -26,7 +26,7 @@ architecture rtl of {{ds.module_name}} is
     -- CPU Bus interface signals
     ----------------------------------------------------------------------------
     signal cpuif_req : std_logic;
-    signal cpuif_req_is_wr : std_logic;
+    signal cpuif_req_op : csr_access_op;
     signal cpuif_addr : std_logic_vector({{cpuif.addr_width-1}} downto 0);
     signal cpuif_wr_data : std_logic_vector({{cpuif.data_width-1}} downto 0);
     signal cpuif_wr_biten : std_logic_vector({{cpuif.data_width-1}} downto 0);
@@ -70,7 +70,7 @@ architecture rtl of {{ds.module_name}} is
     signal decoded_addr : std_logic_vector({{cpuif.addr_width-1}} downto 0);
 {% endif %}
     signal decoded_req : std_logic;
-    signal decoded_req_is_wr : std_logic;
+    signal decoded_req_op : std_logic;
     signal decoded_wr_data : std_logic_vector({{cpuif.data_width-1}} downto 0);
     signal decoded_wr_biten : std_logic_vector({{cpuif.data_width-1}} downto 0);
 
@@ -162,7 +162,7 @@ begin
         elsif rising_edge(clk) then
             if {{get_resetsignal(cpuif.reset, asynch=False)}} then -- sync reset
                 cpuif_req_stall_sr <= (others => '0');
-            elsif cpuif_req and not cpuif_req_is_wr then
+            elsif cpuif_req then
                 cpuif_req_stall_sr <= (others => '1');
             else
                 cpuif_req_stall_sr <= std_logic_vector(shift_right(unsigned(cpuif_req_stall_sr), 1));
@@ -184,7 +184,7 @@ begin
         elsif rising_edge(clk) then
             if {{get_resetsignal(cpuif.reset, asynch=False)}} then -- sync reset
                 cpuif_req_stall_sr <= '0';
-            elsif cpuif_req and cpuif_req_is_wr then
+            elsif cpuif_req then
                 cpuif_req_stall_sr <= '1';
             else
                 cpuif_req_stall_sr <= std_logic_vector(shift_right(unsigned(cpuif_req_stall_sr), 1));
@@ -199,9 +199,7 @@ begin
     cpuif_req_stall_wr <= '0';
     {%- endif %}
 {%- endif %}
-    cpuif_req_masked <= cpuif_req
-                        and not (not cpuif_req_is_wr and cpuif_req_stall_rd)
-                        and not (cpuif_req_is_wr and cpuif_req_stall_wr);
+    cpuif_req_masked <= cpuif_req;
 
     ----------------------------------------------------------------------------
     -- Address Decode
@@ -243,7 +241,7 @@ begin
         decoded_addr <= cpuif_addr;
     {%- endif %}
         decoded_req <= cpuif_req_masked;
-        decoded_req_is_wr <= cpuif_req_is_wr;
+        decoded_req_op <= cpuif_req_op;
         decoded_wr_data <= cpuif_wr_data;
         decoded_wr_biten <= cpuif_wr_biten;
     {%- if ds.has_writable_msb0_fields %}
@@ -308,9 +306,9 @@ begin
         {{ext_write_acks.get_implementation()|indent(8)}}
         external_wr_ack <= wr_ack;
     end process;
-    cpuif_wr_ack <= external_wr_ack or (decoded_req and decoded_req_is_wr and not decoded_strb_is_external);
+    cpuif_wr_ack <= external_wr_ack or (decoded_req and decoded_req_op /= OP_READ and not decoded_strb_is_external);
 {%- else %}
-    cpuif_wr_ack <= decoded_req and decoded_req_is_wr;
+    cpuif_wr_ack <= decoded_req and decoded_req_op /= OP_READ;
 {%- endif %}
     {%- if ds.err_if_bad_addr or ds.err_if_bad_rw %}
     cpuif_wr_err <= decoded_err;
