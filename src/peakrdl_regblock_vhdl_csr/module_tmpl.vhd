@@ -70,7 +70,7 @@ architecture rtl of {{ds.module_name}} is
     signal decoded_addr : std_logic_vector({{cpuif.addr_width-1}} downto 0);
 {% endif %}
     signal decoded_req : std_logic;
-    signal decoded_req_op : std_logic;
+    signal decoded_req_op : csr_access_op;
     signal decoded_wr_data : std_logic_vector({{cpuif.data_width-1}} downto 0);
     signal decoded_wr_biten : std_logic_vector({{cpuif.data_width-1}} downto 0);
 
@@ -306,9 +306,9 @@ begin
         {{ext_write_acks.get_implementation()|indent(8)}}
         external_wr_ack <= wr_ack;
     end process;
-    cpuif_wr_ack <= external_wr_ack or (decoded_req and decoded_req_op /= OP_READ and not decoded_strb_is_external);
+    cpuif_wr_ack <= external_wr_ack or (decoded_req and to_std_logic(decoded_req_op /= OP_READ) and not decoded_strb_is_external);
 {%- else %}
-    cpuif_wr_ack <= decoded_req and decoded_req_op /= OP_READ;
+    cpuif_wr_ack <= decoded_req and to_std_logic(decoded_req_op /= OP_READ);
 {%- endif %}
     {%- if ds.err_if_bad_addr or ds.err_if_bad_rw %}
     cpuif_wr_err <= decoded_err;

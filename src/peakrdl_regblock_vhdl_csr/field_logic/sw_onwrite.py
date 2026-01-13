@@ -33,9 +33,9 @@ class _OnWrite(NextStateConditional):
             if field.get_property('swwe') or field.get_property('swwel'):
                 # dereferencer will wrap swwel complement if necessary
                 qualifier = self.exp.dereferencer.get_field_propref_value(field, 'swwe')
-                return f"{strb} and (decoded_req_op = OP_WRITE or decoded_req_op = OP_READ_WRITE) and {qualifier}"
+                return f"{strb} and to_std_logic(decoded_req_op = OP_WRITE or decoded_req_op = OP_READ_WRITE) and {qualifier}"
 
-            return f"{strb} and (decoded_req_op = OP_WRITE or decoded_req_op = OP_READ_WRITE)"
+            return f"{strb} and to_std_logic(decoded_req_op = OP_WRITE or decoded_req_op = OP_READ_WRITE)"
 
     def get_assignments(self, field: 'FieldNode') -> List[str]:
         accesswidth = field.parent.get_property("accesswidth")
@@ -141,7 +141,7 @@ class WriteCustomSet(_OnWrite):
     def get_predicate(self, field: 'FieldNode') -> str:
         # is regular register
         strb = self.exp.dereferencer.get_access_strobe(field)
-        return f"{strb} and decoded_req_op = OP_READ_SET"
+        return f"{strb} and to_std_logic(decoded_req_op = OP_READ_SET)"
 
 class WriteCustomClear(_OnWrite):
     comment = "SW write custom 1 clear"
@@ -153,4 +153,4 @@ class WriteCustomClear(_OnWrite):
     def get_predicate(self, field: 'FieldNode') -> str:
         # is regular register
         strb = self.exp.dereferencer.get_access_strobe(field)
-        return f"{strb} and decoded_req_op = OP_READ_CLEAR"
+        return f"{strb} and to_std_logic(decoded_req_op = OP_READ_CLEAR)"

@@ -137,7 +137,7 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
 
     def process_reg(self, node: RegNode) -> None:
         current_bit = 0
-        rd_strb = f"({self.exp.dereferencer.get_access_strobe(node)} and decoded_req_op /= OP_WRITE)"
+        rd_strb = f"({self.exp.dereferencer.get_access_strobe(node)} and to_std_logic(decoded_req_op /= OP_WRITE))"
         # Fields are sorted by ascending low bit
         for field in node.fields():
             if not field.is_sw_readable:
@@ -183,14 +183,14 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
             n_subwords = regwidth // accesswidth
             astrb = self.exp.dereferencer.get_access_strobe(node, reduce_substrobes=False)
             for i in range(n_subwords):
-                rd_strb = f"({astrb}({i}) and decoded_req_op /= OP_WRITE)"
+                rd_strb = f"({astrb}({i}) and to_std_logic(decoded_req_op /= OP_WRITE))"
                 bslice = f"({(i + 1) * accesswidth - 1} downto {i*accesswidth})"
                 self.add_content(f"readback_array({self.current_offset_str}) <= {rbuf}{bslice} when {rd_strb} else (others => '0');")
                 self.current_offset += 1
 
         else:
             # Is regular reg
-            rd_strb = f"({self.exp.dereferencer.get_access_strobe(node)} and decoded_req_op /= OP_WRITE)"
+            rd_strb = f"({self.exp.dereferencer.get_access_strobe(node)} and to_std_logic(decoded_req_op /= OP_WRITE))"
             self.add_content(f"readback_array({self.current_offset_str})({regwidth-1} downto 0) <= {rbuf} when {rd_strb} else (others => '0');")
 
             bus_width = self.exp.cpuif.data_width
@@ -211,7 +211,7 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
 
         # Generate assignments for first sub-word
         bidx = 0
-        rd_strb = f"({astrb}(0) and decoded_req_op /= OP_WRITE)"
+        rd_strb = f"({astrb}(0) and to_std_logic(decoded_req_op /= OP_WRITE))"
         for field in node.fields():
             if not field.is_sw_readable:
                 continue
@@ -275,7 +275,7 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
         n_subwords = regwidth // accesswidth
         rbuf = self.exp.read_buffering.get_rbuf_data(node)
         for i in range(1, n_subwords):
-            rd_strb = f"({astrb}({i}) and decoded_req_op /= OP_WRITE)"
+            rd_strb = f"({astrb}({i}) and to_std_logic(decoded_req_op /= OP_WRITE))"
             bslice = f"({(i + 1) * accesswidth - 1} downto {i*accesswidth})"
             self.add_content(f"readback_array({self.current_offset_str}) <= {rbuf}{bslice} when {rd_strb} else (others => '0');")
             self.current_offset += 1
@@ -318,7 +318,7 @@ class ReadbackAssignmentGenerator(RDLForLoopGenerator):
             field_pos = field.low
             while current_bit <= field.high:
                 # Assign the field
-                rd_strb = f"({access_strb}({subword_idx}) and decoded_req_op /= OP_WRITE)"
+                rd_strb = f"({access_strb}({subword_idx}) and to_std_logic(decoded_req_op /= OP_WRITE))"
                 if (field_pos == field.low) and (field.high < accesswidth*(subword_idx+1)):
                     # entire field fits into this subword
                     low = field.low - accesswidth * subword_idx

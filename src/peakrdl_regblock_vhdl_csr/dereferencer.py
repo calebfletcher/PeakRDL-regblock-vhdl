@@ -77,7 +77,10 @@ class Dereferencer:
                     f"Field '{obj.inst_name}' is a constant but does not have a known value (missing reset). Assigning it a value of X.",
                     obj.inst.inst_src_ref
                 )
-                return "'X'"
+                if width == 1:
+                    return "'X'"
+                else:
+                    return f'{obj.width}x"X"'
 
         if isinstance(obj, SignalNode):
             # Signals are always inputs from the hwif

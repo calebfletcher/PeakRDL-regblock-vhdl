@@ -52,7 +52,7 @@ Changelog = "https://github.com/SystemRDL/PeakRDL-regblock-vhdl/releases"
 Documentation = "https://peakrdl-regblock-vhdl.readthedocs.io/"
 
 [tool.setuptools.dynamic]
-version = { attr = "peakrdl_regblock_vhdl.__about__.__version__" }
+version = { attr = "peakrdl_regblock_vhdl_csr.__about__.__version__" }
 
 [dependency-groups]
 dev = [

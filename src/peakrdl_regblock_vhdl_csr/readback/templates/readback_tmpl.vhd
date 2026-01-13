@@ -45,9 +45,9 @@ process({{get_always_ff_event(cpuif.reset)}}) begin
             readback_array_r <= readback_array_c;
             readback_err_r <= decoded_err;
             {%- if ds.has_external_addressable %}
-            readback_done_r <= decoded_req and decoded_req_op /= OP_WRITE and not decoded_strb_is_external;
+            readback_done_r <= decoded_req and to_std_logic(decoded_req_op /= OP_WRITE) and not decoded_strb_is_external;
             {%- else %}
-            readback_done_r <= decoded_req and decoded_req_op /= OP_WRITE;
+            readback_done_r <= decoded_req and to_std_logic(decoded_req_op /= OP_WRITE);
             {%- endif %}
         end if;
     end if;
@@ -77,9 +77,9 @@ process(all)
     variable readback_data_var : std_logic_vector({{cpuif.data_width-1}} downto 0) := (others => '0');
 begin
     {%- if ds.has_external_addressable %}
-    readback_done <= decoded_req and decoded_req_op /= OP_WRITE and not decoded_strb_is_external;
+    readback_done <= decoded_req and to_std_logic(decoded_req_op /= OP_WRITE) and not decoded_strb_is_external;
     {%- else %}
-    readback_done <= decoded_req and decoded_req_op /= OP_WRITE;
+    readback_done <= decoded_req and to_std_logic(decoded_req_op /= OP_WRITE);
     {%- endif %}
     {%- if ds.err_if_bad_addr or ds.err_if_bad_rw %}
     readback_err <= decoded_err;
@@ -97,7 +97,7 @@ end process;
 
 
 {%- else %}
-readback_done <= decoded_req and decoded_req_op /= OP_WRITE;
+readback_done <= decoded_req and to_std_logic(decoded_req_op /= OP_WRITE);
 readback_data <= '0';
 {%- if ds.err_if_bad_addr or ds.err_if_bad_rw %}
 readback_err <= decoded_err;
